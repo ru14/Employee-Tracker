@@ -8,7 +8,7 @@ utilized_budget decimal,
 primary key (id)
 );
 
-CREATE TABLE ROLE (
+CREATE TABLE ROLES (
 id int not null auto_increment,
 title varchar(30),
 salary decimal,
@@ -23,10 +23,10 @@ first_name varchar(30)not null,
 last_name varchar(30)not null,
 employee_dept varchar(30)not null,
 salary decimal not null,
-role_id int not null,
+roles_id int not null,
 manager_id int,
 foreign key(manager_id)references employee (id),
-foreign key(role_id)references roles (id),
+foreign key(roles_id)references roles (id),
 primary key (id)
 );
 
