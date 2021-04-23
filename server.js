@@ -27,11 +27,11 @@ function runSearch() {
         .then(function (answer) {
             switch (answer.VeiwEmployee) {
                 case "Veiw all departments.":
-                    viewDepartment();
+                    viewDepartments();
                     break;
 
                 case "View all employees.":
-                    VeiwAllEmployees();
+                    veiwAllEmployees();
                     break;
 
                 case "Veiw all employees by department.":
@@ -61,4 +61,14 @@ function runSearch() {
 
 
         });
-}
+};
+
+function viewDepartments()
+function veiwAllEmployees()
+function viewEmployeeByDept()
+function viewEmployeeByManager()
+function addEmployees()
+function removeEmployees()
+function upadateEmployees()
+function upadateEmployeesManager()
+function endSession()
