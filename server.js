@@ -7,13 +7,16 @@ let db = mysql.creatConnection({
     port: 3306,
     user: 'root',
     password: 'password',
-    database: 'employees_db'
+    database: 'employees_DB'
 });
 
-db.connect(function (err) {
-    if (err) throw err;
-    console.log("connected as id" + connection.threadId + "\n");
+db.connect((err) =>{
+    if (err) {
+        throw err;
+    }
 
+    console.log(`connected at: ${db.threadId}`);
+    runSearch()
 });
 
 function runSearch() {
@@ -63,7 +66,13 @@ function runSearch() {
         });
 };
 
-function viewDepartments()
+function viewDepartments(){
+    db.query("Select id, dept_name, utilized_budget FROM DEPARTMENT", function(err, results){
+        if(err) throw err;
+        console.table("DEPARTMENT", results);
+        runSearch();
+    });
+};
 function veiwAllEmployees()
 function viewEmployeeByDept()
 function viewEmployeeByManager()
