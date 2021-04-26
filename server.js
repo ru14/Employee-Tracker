@@ -1,8 +1,8 @@
-const mysql = require("mysqul");
+const mysql = require("mysql");
 const inquirer = require("inquirer");
 const consoleTable = ("console.table");
 
-let db = mysql.creatConnection({
+let db = mysql.createConnection({
     host: 'localhost',
     port: 3306,
     user: 'root',
@@ -20,13 +20,13 @@ db.connect((err) =>{
 });
 
 function runSearch() {
-    inquirer.prompt(
+    inquirer.prompt([
         {
             name: "VeiwEmployee",
             type: "list",
             message: "Which devision you want to see?",
             choices: ["Veiw all departments.", "View all employees.", "Veiw all employees by department.", "Veiw all employees by manager."]
-        })
+        }])
         .then(function (answer) {
             switch (answer.VeiwEmployee) {
                 case "Veiw all departments.":
@@ -71,13 +71,34 @@ function viewDepartments(){
         if(err) throw err;
         console.table("DEPARTMENT", results);
         runSearch();
+        db.end();
     });
 };
-function veiwAllEmployees()
-function viewEmployeeByDept()
-function viewEmployeeByManager()
-function addEmployees()
-function removeEmployees()
-function upadateEmployees()
-function upadateEmployeesManager()
-function endSession()
+function veiwAllEmployees(){
+    let query = "Select employee.id, employee.first_name, employee.last_name, department.dept_name";
+    query += "FROM employee";
+    query += "INNER JOIN department ON employee.employee_dept = department.dept_name"
+    query += "INNER JOIN role ON department.id = roles.department_id";
+    query += "INNER JOIN manager ON employee.manager_id = manager.id";
+
+    db.connection.query(query, function(err,results){
+        console.table('All Employees', results);
+        runSearch()
+    })
+};
+function viewEmployeeByDept(){
+    let query = "SELECT department.dept_name,employee.id, employee.first_name, employee.last_name";
+    query += "FROM department";
+    query += "INNER JOIN employee ON employee.employee_dept = department.dept_name";
+    query += "ORDER BY department.dept_name";
+    db.connection.query(query, function(err,results){
+        console.table('Employees By Manager', results);
+        runSearch()
+    })
+};
+// function viewEmployeeByManager()
+// function addEmployees()
+// function removeEmployees()
+// function upadateEmployees()
+// function upadateEmployeesManager()
+// function endSession()
