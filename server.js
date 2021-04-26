@@ -44,10 +44,10 @@ function runSearch() {
                 case "Veiw all employees by manager.":
                     viewEmployeeByManager();
                     break;
-                case "Add employees.":
+                case "Add employee.":
                     addEmployees();
                     break;
-                case "Remove employees.":
+                case "Remove employee.":
                     removeEmployees();
                     break;
                 case "Update employee role.":
@@ -65,13 +65,14 @@ function runSearch() {
 
         });
 };
+//function addEmployees()
 
 function viewDepartments(){
-    db.query("Select id, dept_name, utilized_budget FROM DEPARTMENT", function(err, results){
+    db.query("Select id, dept_name, utilized_budget FROM DEPARTMENT", function(err, res){
         if(err) throw err;
-        console.table("DEPARTMENT", results);
+        console.table("DEPARTMENT", res);
         runSearch();
-        db.end();
+       
     });
 };
 function veiwAllEmployees(){
@@ -81,8 +82,8 @@ function veiwAllEmployees(){
     query += "INNER JOIN role ON department.id = roles.department_id";
     query += "INNER JOIN manager ON employee.manager_id = manager.id";
 
-    db.connection.query(query, function(err,results){
-        console.table('All Employees', results);
+    db.query(query, function(err,res){
+        console.table('All Employees', res);
         runSearch()
     })
 };
@@ -91,8 +92,8 @@ function viewEmployeeByDept(){
     query += "FROM department";
     query += "INNER JOIN employee ON employee.employee_dept = department.dept_name";
     query += "ORDER BY department.dept_name";
-    db.connection.query(query, function(err,results){
-        console.table('Employees By Manager', results);
+    db.query(query, function(err,res){
+        console.table('Employees By Manager', res);
         runSearch()
     })
 };
@@ -102,12 +103,12 @@ function viewEmployeeByManager(){
     query += "FROM manager";
     query += "INNER JOIN employee ON manager.id = empolyee.manager.id";
     query += "ORDER BY manager.manager_name";
-    db.connection.query(query, function(err,results){
-        console.table('Employees By Manager', results);
+    db.query(query, function(err,res){
+        console.table('Employees By Manager', res);
         runSearch()
     })
 };
-// function addEmployees()
+
 // function removeEmployees()
 // function upadateEmployees()
 // function upadateEmployeesManager()
