@@ -65,7 +65,16 @@ function runSearch() {
 
         });
 };
-//function addEmployees()
+async function addEmployees(employee){
+    const rolesId = await obtainRoleId(employee.role);
+    const managerId = await obtainEmployeeId(employee.manager);
+    const query = 'INSERT INTO employee (first_name,last_name,employee_dept,salary,roles_id,manager_id) VALUE(?,?,?,?)'
+    const args = [employee.first_name, employee.last_name, roles_id, manager_id ];
+    db.query(query, function(err,res){
+        console.table(`${employee.first_name, employee.last_name}added`, res);
+        runSearch()
+    })
+};
 
 function viewDepartments(){
     db.query("Select id, dept_name, utilized_budget FROM DEPARTMENT", function(err, res){
