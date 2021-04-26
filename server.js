@@ -96,7 +96,17 @@ function viewEmployeeByDept(){
         runSearch()
     })
 };
-// function viewEmployeeByManager()
+function viewEmployeeByManager(){
+    console.log("View Employees By Manager");
+    let query = "SELECT manager.id, manager.manager_name, employee.first_name, employee.last_name";
+    query += "FROM manager";
+    query += "INNER JOIN employee ON manager.id = empolyee.manager.id";
+    query += "ORDER BY manager.manager_name";
+    db.connection.query(query, function(err,results){
+        console.table('Employees By Manager', results);
+        runSearch()
+    })
+};
 // function addEmployees()
 // function removeEmployees()
 // function upadateEmployees()
