@@ -1,6 +1,8 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const consoleTable = ("console.table");
+const Employees = require("./Employee");
+
 
 let db = mysql.createConnection({
     host: 'localhost',
@@ -65,8 +67,8 @@ function runSearch() {
 
         });
 };
-async function addEmployees(employee){
-    const rolesId = await obtainRoleId(employee.role);
+async function addEmployees(){
+    const rolesId = await obtainRoleId(employee.roles);
     const managerId = await obtainEmployeeId(employee.manager);
     const query = 'INSERT INTO EMPLOYEE (first_name,last_name,employee_dept,salary,roles_id,manager_id) VALUE(?,?,?,?)'
     const args = [employee.first_name, employee.last_name, roles_id, manager_id ];
@@ -75,6 +77,13 @@ async function addEmployees(employee){
         runSearch()
     })
 };
+// function removeEmployees(){
+//let query = "DELETE FROM EMPLOYEE WHERE first_name =? AND last_name =?";
+//db.query(query, function(err,res){
+//    console.table(`${employee.first_name, employee.last_name}deleted`, res);
+//    runSearch()
+//})
+//};
 
 function viewDepartments(){
     db.query("Select id, dept_name, utilized_budget FROM DEPARTMENT", function(err, res){
@@ -118,7 +127,9 @@ function viewEmployeeByManager(){
     })
 };
 
-// function removeEmployees()
-// function upadateEmployees()
+
+// function upadateEmployees(){
+
+
 // function upadateEmployeesManager()
 // function endSession()
