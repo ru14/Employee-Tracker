@@ -25,7 +25,7 @@ function runSearch() {
             name: "VeiwEmployee",
             type: "list",
             message: "Which devision you want to see?",
-            choices: ["Veiw all departments.", "View all employees.", "Veiw all employees by department.", "Veiw all employees by manager."]
+            choices: ["Veiw all departments.", "View all employees.", "Veiw all employees by department.", "Veiw all employees by manager.","Add employee."]
         }])
         .then(function (answer) {
             switch (answer.VeiwEmployee) {
@@ -68,7 +68,7 @@ function runSearch() {
 async function addEmployees(employee){
     const rolesId = await obtainRoleId(employee.role);
     const managerId = await obtainEmployeeId(employee.manager);
-    const query = 'INSERT INTO employee (first_name,last_name,employee_dept,salary,roles_id,manager_id) VALUE(?,?,?,?)'
+    const query = 'INSERT INTO EMPLOYEE (first_name,last_name,employee_dept,salary,roles_id,manager_id) VALUE(?,?,?,?)'
     const args = [employee.first_name, employee.last_name, roles_id, manager_id ];
     db.query(query, function(err,res){
         console.table(`${employee.first_name, employee.last_name}added`, res);
@@ -85,11 +85,11 @@ function viewDepartments(){
     });
 };
 function veiwAllEmployees(){
-    let query = "Select employee.id, employee.first_name, employee.last_name, department.dept_name";
-    query += "FROM employee";
-    query += "INNER JOIN department ON employee.employee_dept = department.dept_name"
-    query += "INNER JOIN role ON department.id = roles.department_id";
-    query += "INNER JOIN manager ON employee.manager_id = manager.id";
+    let query = "SELECT employee.id, employee.first_name, employee.last_name, department.dept_name";
+    query += "FROM EMPLOYEE";
+    query += "INNER JOIN DEPARTMENT ON employee.employee_dept = department.dept_name"
+    query += "INNER JOIN ROLES ON department.id = roles.department_id";
+    query += "INNER JOIN MANAGER ON employee.manager_id = manager.id";
 
     db.query(query, function(err,res){
         console.table('All Employees', res);
@@ -98,8 +98,8 @@ function veiwAllEmployees(){
 };
 function viewEmployeeByDept(){
     let query = "SELECT department.dept_name,employee.id, employee.first_name, employee.last_name";
-    query += "FROM department";
-    query += "INNER JOIN employee ON employee.employee_dept = department.dept_name";
+    query += "FROM DEPARTMENT";
+    query += "INNER JOIN EMPLOYEE ON employee.employee_dept = department.dept_name";
     query += "ORDER BY department.dept_name";
     db.query(query, function(err,res){
         console.table('Employees By Manager', res);
@@ -109,8 +109,8 @@ function viewEmployeeByDept(){
 function viewEmployeeByManager(){
     console.log("View Employees By Manager");
     let query = "SELECT manager.id, manager.manager_name, employee.first_name, employee.last_name";
-    query += "FROM manager";
-    query += "INNER JOIN employee ON manager.id = empolyee.manager.id";
+    query += "FROM MANAGER";
+    query += "INNER JOIN EMPLOYEE ON manager.id = empolyee.manager.id";
     query += "ORDER BY manager.manager_name";
     db.query(query, function(err,res){
         console.table('Employees By Manager', res);
