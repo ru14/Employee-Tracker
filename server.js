@@ -1,7 +1,8 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
-const consoleTable = ("console.table");
-const Employees = require("./Employee");
+require("console.table");
+const employee = require("./Employee");
+let role;
 
 
 let db = mysql.createConnection({
@@ -21,6 +22,51 @@ db.connect((err) =>{
     runSearch()
 });
 
+function addEmployees(){
+    db.query('SELECT title,id FROM ROLES', function(err,response){
+        
+        let roleChoices = response.map(({title, id})=>({
+            title,
+            id:id
+
+        }));
+        console.log(roleChoices);
+        inquirer.prompt([
+            {
+                type: "input",
+                name: "first_name",
+                message: "Enter first name of employee:"
+            },{
+            
+                    type: "input",
+                    name: "manager_id",
+                    message: "Enter manager id?:"
+            },{
+        
+                type: "input",
+                name: "Last_name",
+                message: "Enter last name of employee:"
+            }, {
+                type: "list",
+                message: "Assign employee role:",
+                name: "role",
+                choices: roleChoices
+            }]).then((answer)=>{
+        
+       const query = 'INSERT INTO EMPLOYEE (first_name,last_name,roles_id,manager_id) VALUE(?,?,?,?)'
+    
+       db.query(query, [answer.first_name,answer.last_name,answer.role.id,answer.manager_id],function(err,res){
+        if(err) throw err;
+        //console.log({res})
+        console.table(`${employee.first_name, employee.last_name}added`, res);
+        runSearch()
+    })
+
+    })
+})
+//console.log({query})c
+    
+};
 function runSearch() {
     inquirer.prompt([
         {
@@ -67,23 +113,8 @@ function runSearch() {
 
         });
 };
-async function addEmployees(){
-    const rolesId = await obtainRoleId(employee.roles);
-    const managerId = await obtainEmployeeId(employee.manager);
-    const query = 'INSERT INTO EMPLOYEE (first_name,last_name,employee_dept,salary,roles_id,manager_id) VALUE(?,?,?,?)'
-    const args = [employee.first_name, employee.last_name, roles_id, manager_id ];
-    db.query(query, function(err,res){
-        console.table(`${employee.first_name, employee.last_name}added`, res);
-        runSearch()
-    })
-};
-// function removeEmployees(){
-//let query = "DELETE FROM EMPLOYEE WHERE first_name =? AND last_name =?";
-//db.query(query, function(err,res){
-//    console.table(`${employee.first_name, employee.last_name}deleted`, res);
-//    runSearch()
-//})
-//};
+
+
 
 function viewDepartments(){
     db.query("Select id, dept_name, utilized_budget FROM DEPARTMENT", function(err, res){
@@ -93,43 +124,59 @@ function viewDepartments(){
        
     });
 };
+
 function veiwAllEmployees(){
-    let query = "SELECT employee.id, employee.first_name, employee.last_name, department.dept_name";
-    query += "FROM EMPLOYEE";
-    query += "INNER JOIN DEPARTMENT ON employee.employee_dept = department.dept_name"
-    query += "INNER JOIN ROLES ON department.id = roles.department_id";
-    query += "INNER JOIN MANAGER ON employee.manager_id = manager.id";
+    let query = "SELECT employee.id, employee.first_name, employee.last_name, employee.employee_dept FROM EMPLOYEE";
+//console.log({query})
 
     db.query(query, function(err,res){
+        if (err) throw err;
+        //console.log({res})
         console.table('All Employees', res);
         runSearch()
+
     })
 };
+// const viewAllRoles = function (){
+//     let query = "SELECT employee.role";
+//     query += "FROM EMPLOYEE";
+
+//     db.query(query, function(err,res){
+//         if(err) throw err;
+//         console.table('All Employees', res);
+//         return res;
+//     })
+//};
+
 function viewEmployeeByDept(){
-    let query = "SELECT department.dept_name,employee.id, employee.first_name, employee.last_name";
-    query += "FROM DEPARTMENT";
-    query += "INNER JOIN EMPLOYEE ON employee.employee_dept = department.dept_name";
-    query += "ORDER BY department.dept_name";
+    let query = " SELECT department.dept_name,employee.id, employee.first_name, employee.last_name ";
+    query += " FROM DEPARTMENT ";
+    query += " INNER JOIN EMPLOYEE ON employee.employee_dept = department.dept_name ";
+    query += " ORDER BY department.dept_name ";
+    //console.log({query})
     db.query(query, function(err,res){
-        console.table('Employees By Manager', res);
+        if(err)throw err;
+        //console.log({res})
+        console.table('Employees By Department', res);
         runSearch()
     })
 };
 function viewEmployeeByManager(){
-    console.log("View Employees By Manager");
-    let query = "SELECT manager.id, manager.manager_name, employee.first_name, employee.last_name";
-    query += "FROM MANAGER";
-    query += "INNER JOIN EMPLOYEE ON manager.id = empolyee.manager.id";
-    query += "ORDER BY manager.manager_name";
+    let query = " SELECT manager.id, manager.manager_name, employee.first_name, employee.last_name ";
+    query += " FROM MANAGER ";
+    query += " INNER JOIN EMPLOYEE ON manager.id = employee.manager_id ";
+    query += " ORDER BY manager.manager_name ";
+    //console.log({query})
     db.query(query, function(err,res){
+        if(err) throw err;
+        //console.log({res})
         console.table('Employees By Manager', res);
         runSearch()
     })
 };
 
 
+
+
 // function upadateEmployees(){
-
-
-// function upadateEmployeesManager()
 // function endSession()
