@@ -1,81 +1,64 @@
 const inquirer = require("inquirer");
 
-async function addEmployees() {
-    try {
-        const userInput = await inquirer.prompt([
-            {
-                type: "input",
-                name: "first_name",
-                message: "Enter first name of employee:"
-            }, {
-                type: "input",
-                name: "Last_name",
-                message: "Enter last name of employee:"
-            }, {
-                type: "list",
-                message: "Assign employee role:",
-                name: "role",
-                choices: [
-                    ...role//write out these choices
-                ]
-            }]);
-        //take the userInput variable, which will be an object containing the user's response, then put that response into a db.query to INSERT INTO db using those values
+
+const addNewEmployees = [
+    {
+        type: "input",
+        name: "first_name",
+        message: "Enter first name of employee:"
+    },{
     
-}
+            type: "input",
+            name: "manager_id",
+            message: "Enter manager id?:"
+    },{
 
-catch (err) {
-    console.log({ err })
-}
-};
+        type: "input",
+        name: "Last_name",
+        message: "Enter last name of employee:"
+    }, {
+        type: "list",
+        message: "Assign employee role:",
+        name: "role",
+        choices: ['Administration', 'Surgeon', 'Physican', 'Nurse', 'Cafeteria & Catering', 'Physical Therapy'
+        ]
+    }];
 
-async function acquireRemoveEmployeesInfo() {
+const removeEmployees = [
+    {
 
-    return inquirer.prompt([
-        {
+        type: "list",
+        message: "Select employee to be removed:",
+        name: "employee",
+        // choices: [
+        //     
+    }];
 
-            type: "list",
-            message: "Select employee to be removed:",
-            name: "employee",
-            choices: [
-                ...employee
-            ]
-        }
-    ])
-};
 
-async function updteEmployeeRole() {
-    const roles = await obtainRoles();
 
-    return inquirer.prompt([
-        {
+    // const addNewRole = [
+    //     {
 
-            type: "list",
-            message: "Select a new role for employee:",
-            name: "role",
-            choices: [
-                ...roles
-            ]
-        }
-    ])
-};
+    //         type: "list",
+    //         message: "Select a new role for employee:",
+    //         name: "role",
+    //         choices: [
+    //             ...roles
+    //         ]
+    //     }];
 
-async function addDepartment() {
-    const roles = await obtainRoles();
 
-    return inquirer.prompt([
+
+    const addNewDepartment = [
         {
             type: "input",
             message: "Enter new department name:",
             name: "department"
-        }
-    ])
-};
+        }];
 
 
-async function addNewRole() {
-    const depts = await obtainDepartmentName();
-    console.log(depts)
-    return inquirer.prompt([
+
+    const addNewRole =[
         {
             type: "input",
             message: "Enter title of new role:",
@@ -88,11 +71,10 @@ async function addNewRole() {
             type: "list",
             message: "Assign new role to an present department:",
             name: "department",
-            choices: [
-                ...depts
-            ]
-        }
-    ])
-};
+            // choices: [
+            //     ...depts
+            // ]
+        }];
 
-module.exports = { addEmployees, addDepartment, addNewRole, updteEmployeeRole, acquireRemoveEmployeesInfo }
+
+module.exports = { addNewEmployees, addNewDepartment, addNewRole,  removeEmployees }

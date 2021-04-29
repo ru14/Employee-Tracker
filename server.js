@@ -24,13 +24,22 @@ db.connect((err) =>{
 
 function addEmployees(){
     db.query('SELECT title,id FROM ROLES', function(err,response){
-        
-        let roleChoices = response.map(({title, id})=>({
-            title,
-            id:id
+        if (err) {
+            throw err;
+            }
+            let roleChoicesMap = response.map(({title, id})=>({
+                title,
+                id:id
+    
+            }));
 
-        }));
-        console.log(roleChoices);
+    
+        let roleChoices = response.map(({title, id})=> {
+            return title
+        });
+
+       
+        console.log("RoleChoicesMap: " + roleChoicesMap);
         inquirer.prompt([
             {
                 type: "input",
@@ -51,8 +60,18 @@ function addEmployees(){
                 message: "Assign employee role:",
                 name: "role",
                 choices: roleChoices
-            }]).then((answer)=>{
+            },
+        ])
+            .then((answer)=>{
         
+        console.log("Role answer: " + answer.role);
+        let answerRoleString = answer.role;
+        console.log("Role Choices: " + roleChoicesMap);
+        let selectedRole = roleChoicesMap.find( item => {
+            item.title == answerRoleString
+        });
+
+//console.log("ID: " + selectedRole.id);
        const query = 'INSERT INTO EMPLOYEE (first_name,last_name,roles_id,manager_id) VALUE(?,?,?,?)'
     
        db.query(query, [answer.first_name,answer.last_name,answer.role.id,answer.manager_id],function(err,res){
@@ -67,6 +86,7 @@ function addEmployees(){
 //console.log({query})c
     
 };
+
 function runSearch() {
     inquirer.prompt([
         {
