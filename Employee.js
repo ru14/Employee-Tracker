@@ -1,28 +1,7 @@
 const inquirer = require("inquirer");
 
 
-const addNewEmployees = [
-    {
-        type: "input",
-        name: "first_name",
-        message: "Enter first name of employee:"
-    },{
-    
-            type: "input",
-            name: "manager_id",
-            message: "Enter manager id?:"
-    },{
 
-        type: "input",
-        name: "Last_name",
-        message: "Enter last name of employee:"
-    }, {
-        type: "list",
-        message: "Assign employee role:",
-        name: "role",
-        choices: ['Administration', 'Surgeon', 'Physican', 'Nurse', 'Cafeteria & Catering', 'Physical Therapy'
-        ]
-    }];
 
 const removeEmployees = [
     {
@@ -36,16 +15,22 @@ const removeEmployees = [
 
 
 
-    // const addNewRole = [
-    //     {
+   function addNewRole () {
+    db.query('SELECT title,id FROM ROLES',function (err, response) {
+        if (err) {
+            throw err;
+        }
+        console.log(response);
+        inquirer.prompt([
+        {
 
-    //         type: "list",
-    //         message: "Select a new role for employee:",
-    //         name: "role",
-    //         choices: [
-    //             ...roles
-    //         ]
-    //     }];
+            type: "input",
+            message: "Select a new role for employee:",
+            name: "role",
+            choices: [
+                ...roles
+            ]
+        }]);
 
 
 
