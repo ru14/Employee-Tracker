@@ -15,51 +15,66 @@ const removeEmployees = [
 
 
 
-   function addNewRole () {
-    db.query('SELECT title,id FROM ROLES',function (err, response) {
+
+
+const addNewDepartment = [
+    {
+        type: "input",
+        message: "Enter new department name:",
+        name: "department"
+    }];
+
+
+function addNewDepartment() {
+    db.query('SELECT title,id, salary, department_id FROM ROLES', function (err, response) {
         if (err) {
             throw err;
         }
         console.log(response);
         inquirer.prompt([
-        {
+            {
+                type: "input",
+                message: "Enter new department name:",
+                name: "dept_name "
+            }, {
+                type: "list",
+                message: "Assign new department to an present roles:",
+                name: "role",
+                choices() {
+                    const choiceArray = [];
+                    response.forEach(({ title }) => {
+                        choiceArray.push(title);
+                    });
+                    //console.log({choiceArray});
 
-            type: "input",
-            message: "Select a new role for employee:",
-            name: "role",
-            choices: [
-                ...roles
-            ]
-        }]);
+                    return choiceArray;
+                }
+            },
+        ])
+
+            .then((answer) => {
+
+                let chosenItem;
+                response.forEach((item) => {
+                    if (item.title === answer.role) {
+                        chosenItem = item;
+                    }
+                });
+                const query = `INSERT INTO DEPARTMENT  (dept_name) VALUE(?) `
+
+                db.query(
+
+                    query, [answer.dept_name, chosenItem.id], function (err, res) {
+                        if (err) throw err;
+                        console.table(`${answer.title, answer.roles}added`, res);
+                        runSearch()
+                    })
+
+            })
+    })
+    //console.log({query})c
+
+};
 
 
-
-    const addNewDepartment = [
-        {
-            type: "input",
-            message: "Enter new department name:",
-            name: "department"
-        }];
-
-
-
-    const addNewRole =[
-        {
-            type: "input",
-            message: "Enter title of new role:",
-            name: "role"
-        }, {
-            type: "input",
-            message: "Enter salary of new role:",
-            name: "salary"
-        }, {
-            type: "list",
-            message: "Assign new role to an present department:",
-            name: "department",
-            // choices: [
-            //     ...depts
-            // ]
-        }];
-
-
-module.exports = { addNewEmployees, addNewDepartment, addNewRole,  removeEmployees }
+module.exports = { addNewDepartment, removeEmployees };

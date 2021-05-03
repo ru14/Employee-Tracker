@@ -13,7 +13,7 @@ let db = mysql.createConnection({
     database: 'employees_DB'
 });
 
-db.connect((err) =>{
+db.connect((err) => {
     if (err) {
         throw err;
     }
@@ -22,69 +22,123 @@ db.connect((err) =>{
     runSearch()
 });
 
-function addEmployees(){
-    db.query('SELECT title,id FROM ROLES', function(err,response){
+function addEmployees() {
+    db.query('SELECT title,id, salary, department_id FROM ROLES', function (err, response) {
         if (err) {
             throw err;
-            }
-            let roleChoicesMap = response.map(({title, id})=>({
-                title,
-                id:id
-    
-            }));
-
-    
-        let roleChoices = response.map(({title, id})=> {
-            return title
-        });
-
-       
-        console.log("RoleChoicesMap: " + roleChoicesMap);
+        }
+        console.log(response);
         inquirer.prompt([
             {
                 type: "input",
                 name: "first_name",
                 message: "Enter first name of employee:"
-            },{
-            
-                    type: "input",
-                    name: "manager_id",
-                    message: "Enter manager id?:"
-            },{
-        
+            }, {
+
                 type: "input",
                 name: "Last_name",
                 message: "Enter last name of employee:"
             }, {
                 type: "list",
-                message: "Assign employee role:",
+                message: "Add employee role:",
                 name: "role",
-                choices: roleChoices
+                choices() {
+                    const choiceArray = [];
+                    response.forEach(({ title }) => {
+                        choiceArray.push(title);
+                    });
+                    //console.log({choiceArray});
+
+                    return choiceArray;
+                }
             },
         ])
-            .then((answer)=>{
-        
-        console.log("Role answer: " + answer.role);
-        let answerRoleString = answer.role;
-        console.log("Role Choices: " + roleChoicesMap);
-        let selectedRole = roleChoicesMap.find( item => {
-            item.title == answerRoleString
-        });
 
-//console.log("ID: " + selectedRole.id);
-       const query = 'INSERT INTO EMPLOYEE (first_name,last_name,roles_id,manager_id) VALUE(?,?,?,?)'
-    
-       db.query(query, [answer.first_name,answer.last_name,answer.role.id,answer.manager_id],function(err,res){
-        if(err) throw err;
-        //console.log({res})
-        console.table(`${employee.first_name, employee.last_name}added`, res);
-        runSearch()
-    })
+            .then((answer) => {
 
+                let chosenItem;
+                response.forEach((item) => {
+                    if (item.title === answer.role) {
+                        chosenItem = item;
+                    }
+                });
+
+                //console.log("Choice: " + answer);
+                // console.log("Role: " + answer.role);
+                //response.forEach(item => {
+                //    console.log("Item: " + item.title + " " + item.id);
+                //})
+
+                //console.log("ChosenItem: " + chosenItem.title + " " + chosenItem.id);
+
+                const query = `INSERT INTO EMPLOYEE (first_name,Last_name,roles_id) VALUE(?,?,?) `
+
+                db.query(
+
+                    query, [answer.first_name, answer.Last_name, chosenItem.id], function (err, res) {
+                        if (err) throw err;
+                        console.table(`${answer.first_name, answer.last_name}added`, res);
+                        runSearch()
+                    })
+
+            })
     })
+    //console.log({query})c
+
+};
+function addNewRole() {
+    db.query('SELECT dept_name,id DEPARTMENT', function (err, response) {
+        if (err) {
+            throw err;
+        }
+        console.log(response);
+        inquirer.prompt([
+            {
+                type: "input",
+                message: "Enter title of new role:",
+                name: "title"
+            }, {
+                type: "input",
+                message: "Enter salary of new role:",
+                name: "salary"
+            }, {
+                type: "list",
+                message: "Assign new role to an present department:",
+                name: "department",
+                choices() {
+                    const choiceArray = [];
+                    response.forEach(({ title }) => {
+                        choiceArray.push(title);
+                    });
+                    //console.log({choiceArray});
+
+                    return choiceArray;
+                }
+            },
+        ])
+
+        .then((answer) => {
+
+            let chosenItem;
+            response.forEach((item) => {
+                if (item.title === answer.role) {
+                    chosenItem = item;
+                }
+            });
+            const query = `INSERT INTO ROLES  (title,salary,department_id) VALUE(?,?,?) `
+
+            db.query(
+
+                query, [answer.first_name, answer.Last_name, chosenItem.id], function (err, res) {
+                    if (err) throw err;
+                    console.table(`${answer.title, answer.roles}added`, res);
+                    runSearch()
+                })
+
+        })
 })
 //console.log({query})c
-    
+
 };
 
 function runSearch() {
@@ -93,7 +147,7 @@ function runSearch() {
             name: "VeiwEmployee",
             type: "list",
             message: "Which devision you want to see?",
-            choices: ["Veiw all departments.", "View all employees.", "Veiw all employees by department.", "Veiw all employees by manager.","Add employee."]
+            choices: ["Veiw all departments.", "View all employees.", "Veiw all employees by roles.", "Veiw all employees by manager.", "Add employee.", "Add New role."]
         }])
         .then(function (answer) {
             switch (answer.VeiwEmployee) {
@@ -105,8 +159,8 @@ function runSearch() {
                     veiwAllEmployees();
                     break;
 
-                case "Veiw all employees by department.":
-                    viewEmployeeByDept();
+                case "Veiw all employees by roles.":
+                    viewEmployeeByRoles();
                     break;
 
                 case "Veiw all employees by manager.":
@@ -114,6 +168,9 @@ function runSearch() {
                     break;
                 case "Add employee.":
                     addEmployees();
+                    break;
+                case "Add New role.":
+                    addNewRole();
                     break;
                 case "Remove employee.":
                     removeEmployees();
@@ -136,20 +193,25 @@ function runSearch() {
 
 
 
-function viewDepartments(){
-    db.query("Select id, dept_name, utilized_budget FROM DEPARTMENT", function(err, res){
-        if(err) throw err;
+function viewDepartments() {
+    db.query("Select id, dept_name FROM DEPARTMENT", function (err, res) {
+        if (err) throw err;
         console.table("DEPARTMENT", res);
         runSearch();
-       
+
     });
 };
 
-function veiwAllEmployees(){
-    let query = "SELECT employee.id, employee.first_name, employee.last_name, employee.employee_dept FROM EMPLOYEE";
-//console.log({query})
+function veiwAllEmployees() {
+    let query = `SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.dept_name AS Department, roles.salary,CONCAT(manager.first_name," " ,manager.last_name) AS manager
+    FROM EMPLOYEE
+    LEFT JOIN roles ON employee.roles_id = roles.id
+    LEFT JOIN department ON roles.department_id = department.id
+    LEFT JOIN employee manager ON manager.id = employee.manager_id`;
 
-    db.query(query, function(err,res){
+    //console.log({query})
+
+    db.query(query, function (err, res) {
         if (err) throw err;
         //console.log({res})
         console.table('All Employees', res);
@@ -168,27 +230,28 @@ function veiwAllEmployees(){
 //     })
 //};
 
-function viewEmployeeByDept(){
-    let query = " SELECT department.dept_name,employee.id, employee.first_name, employee.last_name ";
-    query += " FROM DEPARTMENT ";
-    query += " INNER JOIN EMPLOYEE ON employee.employee_dept = department.dept_name ";
+function viewEmployeeByRoles() {
+    let query = " SELECT department.dept_name AS Department,employee.id, employee.first_name, employee.last_name ";
+    query += " FROM EMPLOYEE ";
+    query += " LEFT JOIN roles ON employee.roles_id = roles.id "
+    query += " LEFT JOIN department ON roles.department_id = department.id ";
     query += " ORDER BY department.dept_name ";
     //console.log({query})
-    db.query(query, function(err,res){
-        if(err)throw err;
+    db.query(query, function (err, res) {
+        if (err) throw err;
         //console.log({res})
         console.table('Employees By Department', res);
         runSearch()
     })
 };
-function viewEmployeeByManager(){
-    let query = " SELECT manager.id, manager.manager_name, employee.first_name, employee.last_name ";
+function viewEmployeeByManager() {
+    let query = " SELECT CONCAT(manager.first_name ,manager.last_name) AS manager, employee.first_name, employee.last_name ";
     query += " FROM MANAGER ";
-    query += " INNER JOIN EMPLOYEE ON manager.id = employee.manager_id ";
-    query += " ORDER BY manager.manager_name ";
+    query += " LEFT JOIN employee manager ON manager.id = employee.manager_id ";
+    query += " ORDER BY manager.first_name ";
     //console.log({query})
-    db.query(query, function(err,res){
-        if(err) throw err;
+    db.query(query, function (err, res) {
+        if (err) throw err;
         //console.log({res})
         console.table('Employees By Manager', res);
         runSearch()
@@ -197,6 +260,6 @@ function viewEmployeeByManager(){
 
 
 
-
+//module.exports = db;
 // function upadateEmployees(){
 // function endSession()
