@@ -117,27 +117,77 @@ function addNewRole() {
             },
         ])
 
-        .then((answer) => {
+            .then((answer) => {
 
-            let chosenItem;
-            response.forEach((item) => {
-                if (item.title === answer.role) {
-                    chosenItem = item;
+                let chosenItem;
+                response.forEach((item) => {
+                    if (item.title === answer.role) {
+                        chosenItem = item;
+                    }
+                });
+                const query = `INSERT INTO ROLES  (title,salary,department_id) VALUE(?,?,?) `
+
+                db.query(
+
+                    query, [answer.first_name, answer.Last_name, chosenItem.id], function (err, res) {
+                        if (err) throw err;
+                        console.table(`${answer.title, answer.roles}added`, res);
+                        runSearch()
+                    })
+
+            })
+    })
+    //console.log({query})c
+
+};
+function addNewDepartment() {
+    db.query('SELECT title,id, salary, department_id FROM ROLES', function (err, response) {
+        if (err) {
+            throw err;
+        }
+        console.log(response);
+        inquirer.prompt([
+            {
+                type: "input",
+                message: "Enter new department name:",
+                name: "dept_name "
+            }, {
+                type: "list",
+                message: "Assign new department to an present roles:",
+                name: "role",
+                choices() {
+                    const choiceArray = [];
+                    response.forEach(({ title }) => {
+                        choiceArray.push(title);
+                    });
+                    //console.log({choiceArray});
+
+                    return choiceArray;
                 }
-            });
-            const query = `INSERT INTO ROLES  (title,salary,department_id) VALUE(?,?,?) `
+            },
+        ])
 
-            db.query(
+            .then((answer) => {
 
-                query, [answer.first_name, answer.Last_name, chosenItem.id], function (err, res) {
-                    if (err) throw err;
-                    console.table(`${answer.title, answer.roles}added`, res);
-                    runSearch()
-                })
+                let chosenItem;
+                response.forEach((item) => {
+                    if (item.title === answer.role) {
+                        chosenItem = item;
+                    }
+                });
+                const query = `INSERT INTO DEPARTMENT  (dept_name) VALUE(?) `
 
-        })
-})
-//console.log({query})c
+                db.query(
+
+                    query, [answer.dept_name, chosenItem.id], function (err, res) {
+                        if (err) throw err;
+                        console.table(`${answer.title, answer.roles}added`, res);
+                        runSearch()
+                    })
+
+            })
+    })
+    //console.log({query})c
 
 };
 
@@ -147,7 +197,7 @@ function runSearch() {
             name: "VeiwEmployee",
             type: "list",
             message: "Which devision you want to see?",
-            choices: ["Veiw all departments.", "View all employees.", "Veiw all employees by roles.", "Veiw all employees by manager.", "Add employee.", "Add New role."]
+            choices: ["Veiw all departments.", "View all employees.", "Veiw all employees by roles.", "Veiw all employees by manager.", "Add employee.", "Add New role.", "addNewDepartment"]
         }])
         .then(function (answer) {
             switch (answer.VeiwEmployee) {
@@ -171,6 +221,9 @@ function runSearch() {
                     break;
                 case "Add New role.":
                     addNewRole();
+                    break;
+                case "Add New department.":
+                    addNewDepartment();
                     break;
                 case "Remove employee.":
                     removeEmployees();
