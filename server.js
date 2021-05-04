@@ -86,8 +86,9 @@ function addEmployees() {
     //console.log({query})c
 
 };
+
 function addNewRole() {
-    db.query('SELECT dept_name,id DEPARTMENT', function (err, response) {
+    db.query('SELECT dept_name,id FROM DEPARTMENT', function (err, response) {
         if (err) {
             throw err;
         }
@@ -107,8 +108,8 @@ function addNewRole() {
                 name: "department",
                 choices() {
                     const choiceArray = [];
-                    response.forEach(({ title }) => {
-                        choiceArray.push(title);
+                    response.forEach(({ dept_name }) => {
+                        choiceArray.push(dept_name);
                     });
                     //console.log({choiceArray});
 
@@ -121,7 +122,7 @@ function addNewRole() {
 
                 let chosenItem;
                 response.forEach((item) => {
-                    if (item.title === answer.role) {
+                    if (item.dept_name === answer.department) {
                         chosenItem = item;
                     }
                 });
@@ -140,6 +141,7 @@ function addNewRole() {
     //console.log({query})c
 
 };
+
 function addNewDepartment() {
     db.query('SELECT title,id, salary, department_id FROM ROLES', function (err, response) {
         if (err) {
@@ -197,7 +199,7 @@ function runSearch() {
             name: "VeiwEmployee",
             type: "list",
             message: "Which devision you want to see?",
-            choices: ["Veiw all departments.", "View all employees.", "Veiw all employees by roles.", "Veiw all employees by manager.", "Add employee.", "Add New role.", "addNewDepartment"]
+            choices: ["Veiw all departments.", "View all employees.", "Veiw all employees by roles.", "Veiw all employees by manager.", "Add employee.", "Add New role.", "Add New Department"]
         }])
         .then(function (answer) {
             switch (answer.VeiwEmployee) {
@@ -244,15 +246,19 @@ function runSearch() {
         });
 };
 
-
-
 function viewDepartments() {
-    db.query("Select id, dept_name FROM DEPARTMENT", function (err, res) {
+    let query = " SELECT department.dept_name AS Department,employee.id, employee.first_name, employee.last_name ";
+    query += " FROM EMPLOYEE ";
+    query += " LEFT JOIN roles ON employee.roles_id = roles.id "
+    query += " LEFT JOIN department ON roles.department_id = department.id ";
+    query += " ORDER BY department.dept_name ";
+    //console.log({query})
+    db.query(query, function (err, res) {
         if (err) throw err;
-        console.table("DEPARTMENT", res);
-        runSearch();
-
-    });
+        //console.log({res})
+        console.table('Employees By Department', res);
+        runSearch()
+    })
 };
 
 function veiwAllEmployees() {
@@ -272,23 +278,13 @@ function veiwAllEmployees() {
 
     })
 };
-// const viewAllRoles = function (){
-//     let query = "SELECT employee.role";
-//     query += "FROM EMPLOYEE";
-
-//     db.query(query, function(err,res){
-//         if(err) throw err;
-//         console.table('All Employees', res);
-//         return res;
-//     })
-//};
 
 function viewEmployeeByRoles() {
-    let query = " SELECT department.dept_name AS Department,employee.id, employee.first_name, employee.last_name ";
+    let query = " SELECT roles.title ,roles.salary, employee.id, employee.first_name, employee.last_name ";
     query += " FROM EMPLOYEE ";
     query += " LEFT JOIN roles ON employee.roles_id = roles.id "
     query += " LEFT JOIN department ON roles.department_id = department.id ";
-    query += " ORDER BY department.dept_name ";
+    query += " ORDER BY roles.title ";
     //console.log({query})
     db.query(query, function (err, res) {
         if (err) throw err;
@@ -297,8 +293,9 @@ function viewEmployeeByRoles() {
         runSearch()
     })
 };
+
 function viewEmployeeByManager() {
-    let query = " SELECT CONCAT(manager.first_name ,manager.last_name) AS manager, employee.first_name, employee.last_name ";
+    let query = " CONCAT(manager.first_name,manager.last_name) AS manager, employee.first_name, employee.last_name ";
     query += " FROM MANAGER ";
     query += " LEFT JOIN employee manager ON manager.id = employee.manager_id ";
     query += " ORDER BY manager.first_name ";
