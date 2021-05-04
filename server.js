@@ -295,21 +295,16 @@ function viewEmployeeByRoles() {
 };
 
 function viewEmployeeByManager() {
-    db.query('SELECT employee.manager_id, CONCAT(manager.first_name," " ,manager.last_name) AS manager FROM EMPLOYEE', function (err, response) {
-        if (err) {
-            throw err;
-        }
-        console.log(response);
-    // let query = "SELECT CONCAT(manager.first_name,manager.last_name) AS manager FROM EMPLOYEE, roles.title, department.dept_name AS Department, roles.salary, employee.first_name, employee.last_name ";
-    // query += " FROM EMPLOYEE ";
-    // query += " LEFT JOIN manager ON manager.id = employee.manager_id ";
-    // query += " ORDER BY manager.first_name ";
-    // //console.log({query})
-    // db.query(query, function (err, res) {
-    //     if (err) throw err;
-    //     //console.log({res})
-    //     console.table('Employees By Manager', res);
-    //     runSearch()
+    let query = "SELECT CONCAT(manager.first_name,manager.last_name) AS manager FROM EMPLOYEE, roles.title, department.dept_name AS Department, roles.salary, employee.first_name, employee.last_name ";
+    query += " FROM EMPLOYEE ";
+    query += " LEFT JOIN manager ON manager.id = employee.manager_id ";
+    query += " ORDER BY manager.first_name ";
+    //console.log({query})
+    db.query(query, function (err, res) {
+        if (err) throw err;
+        //console.log({res})
+        console.table('Employees By Manager', res);
+        runSearch()
     })
 };
 
