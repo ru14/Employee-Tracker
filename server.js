@@ -280,7 +280,7 @@ function veiwAllEmployees() {
 };
 
 function viewEmployeeByRoles() {
-    let query = " SELECT roles.title ,roles.salary, employee.id, employee.first_name, employee.last_name ";
+    let query = " SELECT roles.title ,roles.salary, employee.id, employee.first_name, employee.last_name ;"
     query += " FROM EMPLOYEE ";
     query += " LEFT JOIN roles ON employee.roles_id = roles.id "
     query += " LEFT JOIN department ON roles.department_id = department.id ";
@@ -295,25 +295,49 @@ function viewEmployeeByRoles() {
 };
 
 function viewEmployeeByManager() {
-    let query = "SELECT CONCAT(manager.first_name,manager.last_name) AS manager FROM EMPLOYEE, roles.title, department.dept_name AS Department, roles.salary, employee.first_name, employee.last_name ";
-    query += " FROM EMPLOYEE ";
-    query += " LEFT JOIN manager ON manager.id = employee.manager_id ";
-    query += " ORDER BY manager.first_name ";
-    //console.log({query})
-    db.query(query, function (err, res) {
-        if (err) throw err;
-        //console.log({res})
-        console.table('Employees By Manager', res);
-        runSearch()
-    })
-};
+    db.query('SELECT CONCAT(first_name,last_name)AS manager FROM EMPLOYEE WHERE manager_id IS NULL', function (err, response) {
+        if (err) {
+            throw err;
+        }
+        console.log(response);
+        let roleChoices = response.map(({ manager }) => ({
+            manager
+        }));
+
+        console.log(roleChoices);
+         let query = `SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.dept_name AS Department, roles.salary 
+          LEFT JOIN roles ON employee.roles_id = roles.id 
+          LEFT JOIN department ON roles.department_id = department.id`
+
+                db.query(
+
+                    query, [roleChoices, query], function (err, res) {
+                        if (err) throw err;
+                        console.table(`${roleChoices, query}added`, res);
+                        runSearch()
+                    })
+    });
+}
+
+        // let query = "SELECT CONCAT(first_name,last_name)AS manager FROM EMPLOYEE WHERE manager_id IS NULL"
+        // query += "LEFT JOIN employee manager ON manager.id = employee.manager_id ";
+        // // query += " LEFT JOIN manager ON manager.id = employee.manager_id ";
+        // // query += " ORDER BY manager.first_name ";
+        // console.log({ query })
+    //     db.query(query, function (err, res) {
+    //         if (err) throw err;
+    //         //console.log({res})
+    //         console.table('Employees By Manager', res);
+    //         runSearch()
+    //     })
+    // };
 
 
 
 //module.exports = db;
 // function upadateEmployeeRole(){
-    // function addEmployees() {
-    //     db.query('SELECT CONCAT(employee.first_name," " ,employee.last_name) AS name title,id, salary, department_id FROM ROLES', function (err, response) {
+
+    //  db.query('SELECT CONCAT(employee.first_name," " ,employee.last_name) AS name title,id, salary, department_id FROM ROLES', function (err, response) {
     //         if (err) {
     //             throw err;
     //         }
@@ -322,9 +346,9 @@ function viewEmployeeByManager() {
     //             {
     //                 type: "input",
     //                 name: "first_name",
-    //                 message: "Enter first name of employee:"
+    //                 message: "Enter first name of employee:" arry
     //             }, {
-    
+
     //                 type: "input",
     //                 name: "Last_name",
     //                 message: "Enter last name of employee:"
@@ -338,43 +362,43 @@ function viewEmployeeByManager() {
     //                         choiceArray.push(title);
     //                     });
     //                     //console.log({choiceArray});
-    
+
     //                     return choiceArray;
     //                 }
     //             },
     //         ])
-    
+
     //             .then((answer) => {
-    
+
     //                 let chosenItem;
     //                 response.forEach((item) => {
     //                     if (item.title === answer.role) {
     //                         chosenItem = item;
     //                     }
     //                 });
-    
+
     //                 //console.log("Choice: " + answer);
     //                 // console.log("Role: " + answer.role);
     //                 //response.forEach(item => {
     //                 //    console.log("Item: " + item.title + " " + item.id);
     //                 //})
-    
+
     //                 //console.log("ChosenItem: " + chosenItem.title + " " + chosenItem.id);
-    
+
     //                 const query = `INSERT INTO EMPLOYEE (first_name,Last_name,roles_id) VALUE(?,?,?) `
-    
+
     //                 db.query(
-    
+
     //                     query, [answer.first_name, answer.Last_name, chosenItem.id], function (err, res) {
     //                         if (err) throw err;
     //                         console.table(`${answer.first_name, answer.last_name}added`, res);
     //                         runSearch()
     //                     })
-    
+
     //             })
     //     })
     //     //console.log({query})c
-    
+
     // };
     // let query = " UPDATE EMPLOYEE ";
     // query += " SET  roles_id = "
