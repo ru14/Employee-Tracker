@@ -1,21 +1,17 @@
-const inquirer = require("inquirer");
+const util = require('util');
+const mysql = require('mysql');
 
+function makeDb( config ) {
+    const connection = mysql.createConnection( config );
+    return {
+      query( sql, args ) {
+        return util.promisify( connection.query )
+          .call( connection, sql, args );
+      },
+      close() {
+        return util.promisify( connection.end ).call( connection );
+      }
+    };
+  }
 
-
-
-const removeEmployees = [
-    {
-
-        type: "list",
-        message: "Select employee to be removed:",
-        name: "employee",
-        // choices: [
-        //     
-    }];
-
-
-
-
-
-
-module.exports = { removeEmployees };
+  module.exports = {makeDb};
