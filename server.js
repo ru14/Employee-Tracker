@@ -201,7 +201,7 @@ function runSearch() {
             name: "VeiwEmployee",
             type: "list",
             message: "Which devision you want to see?",
-            choices: ["Veiw all departments.", "View all employees.", "Veiw all employees by roles.", "Veiw all employees by manager.", "Add employee.", "Add New role.", "Add New Department", "Update employee role.", "Remove."]
+            choices: ["Veiw all departments.", "View all employees.", "Veiw all employees by roles.", "Veiw all employees by manager.", "Add employee.", "Add New role.", "Add New Department", "Update employee role.", "Remove.","View total budget of Department."]
         }])
         .then(function (answer) {
             switch (answer.VeiwEmployee) {
@@ -482,6 +482,39 @@ async function removeRoles(){
         const queryResult3 = await adb.query(removeQueryString);
         runSearch();
 }
-// function UpadateEmployeesManager()
-// function VeiwTotalBudget
+
+
+function UpadateEmployeesManager(){ 
+    let query = `SELECT CONCAT(m.first_name, ' ', m.last_name) AS Manager, e.id AS EmployeeID, CONCAT(e.first_name, ' ', e.last_name) AS EmployeeName,	roles.title AS Role, roles.salary AS Salary,
+department.dept_name AS Department    
+FROM employee e
+INNER JOIN employee m ON 
+	e.manager_id = m.id
+LEFT JOIN roles ON e.roles_id = roles.id 
+LEFT JOIN department ON roles.department_id = department.id
+ORDER BY Manager`;
+
+    //console.log({query})
+
+    db.query(query, function (err, res) {
+        if (err) throw err;
+        //console.log({res})
+        console.table('All Employees', res);
+        runSearch()
+
+    })
+}
+function VeiwTotalBudget(){
+let query = `SELECT SUM(salary) TotalBudget FROM ROLES;`;
+db.query(query, function (err, res) {
+    if (err) throw err;
+    //console.log({res})
+    console.table('All Employees', res);
+    runSearch()
+
+})
+}
+
+
+
 // function endSession()

@@ -13,7 +13,7 @@ id int not null auto_increment,
 title varchar(30),
 salary decimal,
 department_id int,
-foreign key(department_id)references DEPARTMENT (id),
+foreign key(department_id)references DEPARTMENT (id) ON DELETE CASCADE,
 primary key (id)
 );
 
@@ -24,8 +24,8 @@ first_name varchar(30)not null,
 last_name varchar(30)not null,
 roles_id int not null,
 manager_id int,
-foreign key(roles_id)references ROLES(id),
-foreign key(manager_id)references EMPLOYEE(id),
+foreign key(roles_id)references ROLES(id) ON DELETE CASCADE,
+foreign key(manager_id)references EMPLOYEE(id) ON DELETE CASCADE,
 primary key (id)
 );
 
