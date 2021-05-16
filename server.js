@@ -558,4 +558,6 @@ function VeiwTotalBudget() {
     })
 }
 
-function endSession()
+function endSession(){
+    
+}
