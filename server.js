@@ -212,7 +212,7 @@ function runSearch() {
                         "Update employee role.",
                         "Upadte employee manager.",
                         "Remove.",
-                        "View total budget of Department."]
+                        "View total budget of Department.", "End session."]
         }])
         .then(function (answer) {
             switch (answer.VeiwEmployee) {
@@ -253,7 +253,8 @@ function runSearch() {
                     VeiwTotalBudget();
                     break;
                 case "End session.":
-                    endSession();
+                   db.end();
+                   //adb.end();
                     break;
 
                 default:
@@ -559,5 +560,5 @@ function VeiwTotalBudget() {
 }
 
 function endSession(){
-    
+
 }
