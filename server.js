@@ -201,7 +201,18 @@ function runSearch() {
             name: "VeiwEmployee",
             type: "list",
             message: "Which devision you want to see?",
-            choices: ["Veiw all departments.", "View all employees.", "Veiw all employees by roles.", "Veiw all employees by manager.", "Add employee.", "Add New role.", "Add New Department", "Update employee role.", "Remove.","View total budget of Department."]
+            choices: [
+                        "Veiw all departments.",
+                        "View all employees.",
+                        "Veiw all employees by roles.",
+                        "Veiw all employees by manager.",
+                        "Add employee.",
+                        "Add New role.",
+                        "Add New Department.",
+                        "Update employee role.",
+                        "Upadte employee manager.",
+                        "Remove.",
+                        "View total budget of Department."]
         }])
         .then(function (answer) {
             switch (answer.VeiwEmployee) {
@@ -226,7 +237,7 @@ function runSearch() {
                 case "Add New role.":
                     addNewRole();
                     break;
-                case "Add New department.":
+                case "Add New Department.":
                     addNewDepartment();
                     break;
                 case "Remove.":
@@ -245,6 +256,9 @@ function runSearch() {
                     endSession();
                     break;
 
+                default:
+                    console.log("No method mateches with selection.");
+                    break;                    
             }
 
 
@@ -334,7 +348,7 @@ async function updateEmployeeRole() {
         })
     });
 
-    const queryResult2 =  await adb.query('SELECT title, id, salary, department_id FROM ROLES');
+    const queryResult2 = await adb.query('SELECT title, id, salary, department_id FROM ROLES');
     let roleList = [];
     queryResult2.forEach(({ title, id, salary, department_id }) => {
         roleList.push({
@@ -349,7 +363,7 @@ async function updateEmployeeRole() {
     });
 
     console.log({ employeeList });
-    console.log({roleList});
+    console.log({ roleList });
     let answer = await inquirer.prompt([
         {
             type: "list",
@@ -381,39 +395,43 @@ function Remove() {
             type: "list",
             message: "What do you want to remove:",
             name: "remove",
-            choices: ["Remove departments", "Remove Employees", "Remove role"]
+            choices: ["Remove departments", "Remove employees", "Remove roles"]
         },
     ])
-    .then((answer) => {
+        .then((answer) => {
             switch (answer.remove) {
-                case "Remove departments.":
-                    removeDepartment()
+                case "Remove departments":
+                    removeDepartment();
                     break;
 
-                case "Remove Employee":
-                    removeEmployees()
+                case "Remove employees":
+                    removeEmployees();
                     break;
 
-                case "Remove role":
-                    removeRoles()
+                case "Remove roles":
+                    removeRoles();
                     break;
+
+                default:
+                    console.log("Response did not match any option.");
             }
         })
 
 };
 
-async function removeDepartment(){
+async function removeDepartment() {
     const queryResult1 = await adb.query('SELECT dept_name, department.id FROM DEPARTMENT');
     let departmentList = [];
-    queryResult1.forEach(({ dept_name }) => {
+    queryResult1.forEach(({ id, dept_name }) => {
         departmentList.push({
-            name:dept_name + department_id,
+            name:  `${id} ${dept_name}`,            
             value: {
                 dept_name,
-                department_id
+                id
             }
         })
-    }); 
+    });
+
     console.log({ departmentList });
     let answer = await inquirer.prompt([
         {
@@ -423,15 +441,17 @@ async function removeDepartment(){
             choices: departmentList
         }
     ]);
-    const removeQueryString = `DELETE FROM  DEPARTMENT WHERE dept_name = ${answer.dept_name}`;
+
+    const removeQueryString = `DELETE FROM DEPARTMENT WHERE id = ${answer.department.id}`;
+    console.log("Remove query: " + removeQueryString);
     const queryResult3 = await adb.query(removeQueryString);
-    runSearch()
+    runSearch();
 }
 
-async function removeEmployees(){
+async function removeEmployees() {
     const queryResult1 = await adb.query('SELECT employee.first_name ,employee.last_name, employee.id, employee.roles_id, employee.manager_id FROM EMPLOYEE');
     let employeeList = [];
-    queryResult1.forEach(({ first_name,last_name, id }) => {
+    queryResult1.forEach(({ first_name, last_name, id }) => {
         employeeList.push({
             name: first_name + " " + last_name,
             value: {
@@ -442,7 +462,7 @@ async function removeEmployees(){
                 manager_id
             }
         })
-    }); 
+    });
     console.log({ employeeList });
     let answer = await inquirer.prompt([
         {
@@ -452,14 +472,15 @@ async function removeEmployees(){
             choices: employeeList
         }
     ]);
-        const removeQueryString = `DELETE FROM EMPLOYEE WHERE id = ${answer.employee.id}`;
-        const queryResult3 = await adb.query(removeQueryString);
-        runSearch();
+    const removeQueryString = `DELETE FROM EMPLOYEE WHERE id = ${answer.employee.id}`;
+    const queryResult3 = await adb.query(removeQueryString);
+    runSearch();
 }
-async function removeRoles(){
+
+async function removeRoles() {
     const queryResult1 = await adb.query('SELECT roles.title ,roles.salary, roles.id FROM ROLES');
     let rolesList = [];
-    queryResult1.forEach(({title,salary,id }) => {
+    queryResult1.forEach(({ title, salary, id }) => {
         rolesList.push({
             name: title,
             value: {
@@ -468,7 +489,7 @@ async function removeRoles(){
                 id
             }
         })
-    }); 
+    });
     console.log({ rolesList });
     let answer = await inquirer.prompt([
         {
@@ -478,24 +499,56 @@ async function removeRoles(){
             choices: rolesList
         }
     ]);
-        const removeQueryString = `DELETE FROM ROLES WHERE id = ${answer.roles_id}`;
-        const queryResult3 = await adb.query(removeQueryString);
-        runSearch();
+    const removeQueryString = `DELETE FROM ROLES WHERE id = ${answer.roles_id}`;
+    const queryResult3 = await adb.query(removeQueryString);
+    runSearch();
 }
 
 
-function UpadateEmployeesManager(){ 
-    let query = `SELECT CONCAT(m.first_name, ' ', m.last_name) AS Manager, e.id AS EmployeeID, CONCAT(e.first_name, ' ', e.last_name) AS EmployeeName,	roles.title AS Role, roles.salary AS Salary,
-department.dept_name AS Department    
-FROM employee e
-INNER JOIN employee m ON 
-	e.manager_id = m.id
-LEFT JOIN roles ON e.roles_id = roles.id 
-LEFT JOIN department ON roles.department_id = department.id
-ORDER BY Manager`;
+async function UpadateEmployeesManager() {
+    const queryResult1 = await adb.query('SELECT first_name,last_name, employee.id FROM EMPLOYEE');
+    let employeeList = [];
+    queryResult1.forEach(({ first_name, last_name, id }) => {
+        employeeList.push({
+            name: first_name + " " + last_name,
+            value: {
+                first_name,
+                last_name,
+                id
+            }
+        })
+    });
 
-    //console.log({query})
+    console.log({ employeeList });
+    // console.log({ roleList });
+    let answer = await inquirer.prompt([
+        {
+            type: "list",
+            message: "Which employee you want updated?",
+            name: "employee",
+            choices: employeeList
+        }, {
+            type: "list",
+            message: "Which manager you want to assign to this employee?",
+            name: "manager",
+            choices: employeeList
+        }
+    ]);
 
+    console.log({answer});    
+    if(answer.manager.id != answer.employee.id) {
+        const updateQueryString = `UPDATE EMPLOYEE SET manager_id = ${answer.manager.id} WHERE id = ${answer.employee.id}`;
+        console.log(`Update query: ${updateQueryString}`);
+        const queryResult3 = await adb.query(updateQueryString);        
+    } else {
+        console.log("Employee can't be his/her own manager.");
+    }
+
+    runSearch();
+}
+
+function VeiwTotalBudget() {
+    let query = `SELECT SUM(salary) TotalBudget FROM ROLES;`;
     db.query(query, function (err, res) {
         if (err) throw err;
         //console.log({res})
@@ -504,17 +557,5 @@ ORDER BY Manager`;
 
     })
 }
-function VeiwTotalBudget(){
-let query = `SELECT SUM(salary) TotalBudget FROM ROLES;`;
-db.query(query, function (err, res) {
-    if (err) throw err;
-    //console.log({res})
-    console.table('All Employees', res);
-    runSearch()
 
-})
-}
-
-
-
-// function endSession()
+function endSession()
