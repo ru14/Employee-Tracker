@@ -40,6 +40,9 @@ So that I can organize and plan my business
 You are required to submit the following:
 
 * The URL of the GitHub repository
+https://github.com/ru14/Employee-Tracker
+
+
 
 * A video demonstrating the entirety of the app's functionality 
 
