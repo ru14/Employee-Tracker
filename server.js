@@ -202,17 +202,18 @@ function runSearch() {
             type: "list",
             message: "Which devision you want to see?",
             choices: [
-                        "Veiw all departments.",
-                        "View all employees.",
-                        "Veiw all employees by roles.",
-                        "Veiw all employees by manager.",
-                        "Add employee.",
-                        "Add New role.",
-                        "Add New Department.",
-                        "Update employee role.",
-                        "Upadte employee manager.",
-                        "Remove.",
-                        "View total budget of Department.", "End session."]
+                "Veiw all departments.",
+                "View all employees.",
+                "Veiw all roles.",
+                "Veiw all employees by roles.",
+                "Veiw all employees by manager.",
+                "Add employee.",
+                "Add New role.",
+                "Add New Department.",
+                "Update employee role.",
+                "Upadte employee manager.",
+                "Remove.",
+                "View total budget of Department.", "End session."]
         }])
         .then(function (answer) {
             switch (answer.VeiwEmployee) {
@@ -230,6 +231,9 @@ function runSearch() {
 
                 case "Veiw all employees by manager.":
                     viewEmployeeByManager();
+                    break;
+                case "Veiw all roles.":
+                    veiwAllRoles();
                     break;
                 case "Add employee.":
                     addEmployees();
@@ -253,13 +257,13 @@ function runSearch() {
                     VeiwTotalBudget();
                     break;
                 case "End session.":
-                   db.end();
-                   //adb.end();
+                    db.end();
+                    //adb.end();
                     break;
 
                 default:
                     console.log("No method mateches with selection.");
-                    break;                    
+                    break;
             }
 
 
@@ -298,7 +302,19 @@ function veiwAllEmployees() {
 
     })
 }
+function veiwAllRoles() {
+    let query = `SELECT roles.id, roles.title, roles.salary, department.dept_name AS Department 
+    FROM ROLES   
+    LEFT JOIN department ON roles.department_id = department.id`
 
+    db.query(query, function (err, res) {
+        if (err) throw err;
+        //console.log({res})
+        console.table('All ROLES', res);
+        runSearch()
+
+    })
+}
 function viewEmployeeByRoles() {
     let query = " SELECT roles.title ,roles.salary, employee.id, employee.first_name, employee.last_name ";
     query += " FROM EMPLOYEE ";
@@ -425,7 +441,7 @@ async function removeDepartment() {
     let departmentList = [];
     queryResult1.forEach(({ id, dept_name }) => {
         departmentList.push({
-            name:  `${id} ${dept_name}`,            
+            name: `${id} ${dept_name}`,
             value: {
                 dept_name,
                 id
@@ -536,11 +552,11 @@ async function UpadateEmployeesManager() {
         }
     ]);
 
-    console.log({answer});    
-    if(answer.manager.id != answer.employee.id) {
+    console.log({ answer });
+    if (answer.manager.id != answer.employee.id) {
         const updateQueryString = `UPDATE EMPLOYEE SET manager_id = ${answer.manager.id} WHERE id = ${answer.employee.id}`;
         console.log(`Update query: ${updateQueryString}`);
-        const queryResult3 = await adb.query(updateQueryString);        
+        const queryResult3 = await adb.query(updateQueryString);
     } else {
         console.log("Employee can't be his/her own manager.");
     }
@@ -559,6 +575,6 @@ function VeiwTotalBudget() {
     })
 }
 
-function endSession(){
+function endSession() {
 
 }
