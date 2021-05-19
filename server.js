@@ -575,6 +575,3 @@ function VeiwTotalBudget() {
     })
 }
 
-function endSession() {
-
-}
