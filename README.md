@@ -1,3 +1,6 @@
+
+
+
 # Employee-Tracker
 App is used for managing a company's employees using node, inquirer, and MySQL.
 ## Abstract
@@ -46,4 +49,4 @@ https://github.com/ru14/Employee-Tracker
 
 * A video demonstrating the entirety of the app's functionality 
 
-
+https://user-images.githubusercontent.com/74753345/119048772-8bef6900-b974-11eb-9193-f31ca5e03ad0.mp4
