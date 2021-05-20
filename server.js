@@ -154,7 +154,7 @@ function addNewDepartment() {
             {
                 type: "input",
                 message: "Enter new department name:",
-                name: "dept_name "
+                name: "dept_name"
             }, {
                 type: "list",
                 message: "Assign new department to an present roles:",
@@ -162,9 +162,11 @@ function addNewDepartment() {
                 choices() {
                     const choiceArray = [];
                     response.forEach(({ title }) => {
-                        choiceArray.push(title);
+                        if(title !== null) {
+                            choiceArray.push(title);
+                        }
                     });
-                    //console.log({choiceArray});
+                    console.log({choiceArray});
 
                     return choiceArray;
                 }
