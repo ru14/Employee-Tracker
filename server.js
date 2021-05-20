@@ -94,7 +94,7 @@ function addNewRole() {
         if (err) {
             throw err;
         }
-        console.log(response);
+        //console.log(response);
         inquirer.prompt([
             {
                 type: "input",
