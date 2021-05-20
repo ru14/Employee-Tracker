@@ -29,7 +29,7 @@ function addEmployees() {
         if (err) {
             throw err;
         }
-        console.log(response);
+        //console.log(response);
         inquirer.prompt([
             {
                 type: "input",
@@ -132,7 +132,7 @@ function addNewRole() {
 
                 db.query(
 
-                    query, [answer.first_name, answer.Last_name, chosenItem.id], function (err, res) {
+                    query, [answer.title, answer.salary, chosenItem.id], function (err, res) {
                         if (err) throw err;
                         console.table(`${answer.title, answer.roles}added`, res);
                         runSearch()
