@@ -465,9 +465,9 @@ async function removeDepartment() {
 }
 
 async function removeEmployees() {
-    const queryResult1 = await adb.query('SELECT employee.first_name ,employee.last_name, employee.id, employee.roles_id, employee.manager_id FROM EMPLOYEE');
+    const queryResult1 = await adb.query('SELECT employee.first_name, employee.last_name, employee.id, employee.roles_id, employee.manager_id FROM EMPLOYEE');
     let employeeList = [];
-    queryResult1.forEach(({ first_name, last_name, id }) => {
+    queryResult1.forEach(({ first_name, last_name, id, roles_id, manager_id }) => {
         employeeList.push({
             name: first_name + " " + last_name,
             value: {
@@ -494,7 +494,7 @@ async function removeEmployees() {
 }
 
 async function removeRoles() {
-    const queryResult1 = await adb.query('SELECT roles.title ,roles.salary, roles.id FROM ROLES');
+    const queryResult1 = await adb.query('SELECT roles.title, roles.salary, roles.id FROM ROLES');
     let rolesList = [];
     queryResult1.forEach(({ title, salary, id }) => {
         rolesList.push({
@@ -506,16 +506,18 @@ async function removeRoles() {
             }
         })
     });
-    console.log({ rolesList });
+
+    console.log({ rolesList });    
     let answer = await inquirer.prompt([
         {
             type: "list",
-            message: "Which employee you want to remove?",
+            message: "Which role you want to remove?",
             name: "roles",
             choices: rolesList
         }
     ]);
-    const removeQueryString = `DELETE FROM ROLES WHERE id = ${answer.roles_id}`;
+    const removeQueryString = `DELETE FROM ROLES WHERE id = ${answer.roles.id}`;
+    //console.log("Remove query: " + removeQueryString);
     const queryResult3 = await adb.query(removeQueryString);
     runSearch();
 }
