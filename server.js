@@ -273,11 +273,8 @@ function runSearch() {
 }
 
 function viewDepartments() {
-    let query = " SELECT department.dept_name AS Department,employee.id, employee.first_name, employee.last_name ";
-    query += " FROM EMPLOYEE ";
-    query += " LEFT JOIN roles ON employee.roles_id = roles.id "
-    query += " LEFT JOIN department ON roles.department_id = department.id ";
-    query += " ORDER BY department.dept_name ";
+    let query = ` SELECT dept_name, department.id, roles.title, roles.salary FROM DEPARTMENT LEFT JOIN roles ON roles.department_id = department.id `;
+    
     //console.log({query})
     db.query(query, function (err, res) {
         if (err) throw err;
